@@ -4,14 +4,9 @@ seq(slickSettings: _*)
 
 seq(oldLwjglSettings: _*)
 
-//slick.version := "274"
+name := "Tetris"
 
-//seq(LWJGLPlugin.lwjglSetting: _*)
-
-
-name := "myproject"
-
-organization := "com.example"
+organization := "se.ramn"
 
 version := "0.1.0-SNAPSHOT"
 
