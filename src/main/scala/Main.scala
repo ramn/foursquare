@@ -21,7 +21,7 @@ object Tetris {
   val GridOffsetX = BlockSize * ((Width/BlockSize)/3)
   val GridOffsetY = BlockSize
   val FallSpeed = 200
-  val InputReadInterval = 200
+  val InputReadInterval = 150
 
   def main(args: Array[String]) {
     val app = new AppGameContainer(new Tetris)
