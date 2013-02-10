@@ -71,8 +71,8 @@ class Tetris extends BasicGame("Tetris") {
         g.setFont(FontUtil.buildFont)
         g.drawString("Game over!", Width/2-60, Height/2-30)
       case Ongoing =>
-        grid.render(gc, g)
-        block.render(gc, g)
+        grid.render(g)
+        block.render(g)
     }
   }
 

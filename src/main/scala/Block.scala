@@ -20,7 +20,7 @@ sealed trait Block {
 
   def fall: Block
 
-  def render(gc: GameContainer, g: Graphics) {
+  def render(g: Graphics) {
     for ((x, y) <- absolutePiecePositions)
       g.fill(new Rectangle(x, y, BlockSize, BlockSize), gradientFill)
   }

@@ -15,7 +15,7 @@ import Tetris.{GridOffsetX, GridOffsetY}
 class Grid {
   private var grid = mutable.IndexedSeq.fill(GridRows, GridCols)(0)
 
-  def render(gc: GameContainer, g: Graphics) {
+  def render(g: Graphics) {
     renderBorder(g)
     renderFilledCells(g)
     //renderRowNums(g)
