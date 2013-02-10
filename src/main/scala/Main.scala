@@ -131,31 +131,6 @@ class Tetris extends BasicGame("Tetris") {
     gameState = newGameState
   }
 
-  private def filterBlocksOnPressedButton(
-    blocks: List[Block],
-    input: Input
-  ): List[Block] = {
-    val keys = List(
-      Input.KEY_T,
-      Input.KEY_I,
-      Input.KEY_L,
-      Input.KEY_J,
-      Input.KEY_S,
-      Input.KEY_Z,
-      Input.KEY_O)
-    val keyIsPressed = keys.map { key => (key, input.isKeyDown(key)) }.toMap
-    def shouldBeRemoved(block: Block) = block match {
-      case b: T => keyIsPressed(Input.KEY_T)
-      case b: I => keyIsPressed(Input.KEY_I)
-      case b: L => keyIsPressed(Input.KEY_L)
-      case b: J => keyIsPressed(Input.KEY_J)
-      case b: S => keyIsPressed(Input.KEY_S)
-      case b: Z => keyIsPressed(Input.KEY_Z)
-      case b: O => keyIsPressed(Input.KEY_O)
-    }
-    blocks filterNot shouldBeRemoved
-  }
-
   private def buildFont = {
     import java.awt.Font
     import org.newdawn.slick.UnicodeFont
