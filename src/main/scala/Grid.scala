@@ -47,6 +47,9 @@ class Grid {
   }
 
   private def renderFilledCells(g: Graphics) {
+    val gradient =
+      new GradientFill(0, 0, Color.lightGray, 16, 16, Color.white, true)
+
     for {
       (row, rowIx) <- grid.zipWithIndex
       (cell, colIx) <- row.zipWithIndex
@@ -54,7 +57,7 @@ class Grid {
       (x, y) = absoluteCoordinate(colIx, rowIx)
     } {
       g.setColor(Color.white)
-      g.fill(new Rectangle(x, y, BlockSize, BlockSize))
+      g.fill(new Rectangle(x, y, BlockSize, BlockSize), gradient)
     }
   }
 
