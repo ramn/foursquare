@@ -8,6 +8,7 @@ import org.newdawn.slick.geom.Rectangle
 
 import Tetris.BlockSize
 import Tetris.{GridOffsetX, GridOffsetY}
+import Tetris.GridCols
 
 sealed trait Block {
 
@@ -30,11 +31,21 @@ sealed trait Block {
     rotate(1)
   }
 
-  def moveLeft: Block
+  def moveLeft: Block = getMovedIfInside(tryMoveLeft)
 
-  def moveRight: Block
+  def moveRight: Block = getMovedIfInside(tryMoveRight)
+
+  protected def getMovedIfInside(candidate: Block) =
+    if (candidate.isInsideGrid)
+      candidate
+    else
+      this
 
   def fall: Block
+
+  protected def tryMoveLeft: Block
+
+  protected def tryMoveRight: Block
 
   protected def rotate(direction: Int): Block = {
     require(direction == 1 || direction == -1)
@@ -49,13 +60,30 @@ sealed trait Block {
 
   protected val currentRotationNr: Int
 
-  protected def absolutePiecePositions = {
+  protected def absolutePiecePositions =
     for {
       (x, y) <- rotation
       newGridX = (x + gridX) * BlockSize
       newGridY = (y + gridY) * BlockSize
     } yield (newGridX + GridOffsetX, newGridY + GridOffsetY)
+
+  protected def isInsideGrid = {
+    val (leftX, leftY) = leftmostPieceCoord
+    val (rightX, rightY) = rightmostPieceCoord
+    leftX >= 0 && rightX <= GridCols-1
   }
+
+  protected def leftmostPieceCoord: (Int, Int) = {
+    val (x, y) = rotation.minBy { case (x, y) => x }
+    coordForPiece(x, y)
+  }
+
+  protected def rightmostPieceCoord: (Int, Int) = {
+    val (x, y) = rotation.maxBy { case (x, y) => x }
+    coordForPiece(x, y)
+  }
+
+  protected def coordForPiece(x: Int, y: Int) = (x + gridX, y + gridY)
 
   protected val rotation = {
     require((0 to 3) contains currentRotationNr)
@@ -77,8 +105,8 @@ case class T(gridX: Int, gridY: Int, currentRotationNr: Int=0) extends Block {
   protected def gradientFill = buildGradientFill(Color.red, Color.darkGray)
   protected def withNewRotation(newRotationNr: Int) = this.copy(currentRotationNr=newRotationNr)
   def fall: Block = this.copy(gridY=gridY + 1)
-  def moveLeft = this.copy(gridX=gridX - 1)
-  def moveRight = this.copy(gridX=gridX + 1)
+  def tryMoveLeft = this.copy(gridX=gridX - 1)
+  def tryMoveRight = this.copy(gridX=gridX + 1)
 }
 
 case class I(gridX: Int, gridY: Int, currentRotationNr: Int=0) extends Block {
@@ -86,8 +114,8 @@ case class I(gridX: Int, gridY: Int, currentRotationNr: Int=0) extends Block {
   protected def gradientFill = buildGradientFill(Color.orange, Color.white)
   protected def withNewRotation(newRotationNr: Int) = this.copy(currentRotationNr=newRotationNr)
   def fall: Block = this.copy(gridY=gridY + 1)
-  def moveLeft = this.copy(gridX=gridX - 1)
-  def moveRight = this.copy(gridX=gridX + 1)
+  def tryMoveLeft = this.copy(gridX=gridX - 1)
+  def tryMoveRight = this.copy(gridX=gridX + 1)
 }
 
 case class L(gridX: Int, gridY: Int, currentRotationNr: Int=0) extends Block {
@@ -95,8 +123,8 @@ case class L(gridX: Int, gridY: Int, currentRotationNr: Int=0) extends Block {
   protected def gradientFill = buildGradientFill(Color.yellow, Color.black)
   protected def withNewRotation(newRotationNr: Int) = this.copy(currentRotationNr=newRotationNr)
   def fall: Block = this.copy(gridY=gridY + 1)
-  def moveLeft = this.copy(gridX=gridX - 1)
-  def moveRight = this.copy(gridX=gridX + 1)
+  def tryMoveLeft = this.copy(gridX=gridX - 1)
+  def tryMoveRight = this.copy(gridX=gridX + 1)
 }
 
 case class J(gridX: Int, gridY: Int, currentRotationNr: Int=0) extends Block {
@@ -104,8 +132,8 @@ case class J(gridX: Int, gridY: Int, currentRotationNr: Int=0) extends Block {
   protected def gradientFill = buildGradientFill(Color.yellow, Color.black)
   protected def withNewRotation(newRotationNr: Int) = this.copy(currentRotationNr=newRotationNr)
   def fall: Block = this.copy(gridY=gridY + 1)
-  def moveLeft = this.copy(gridX=gridX - 1)
-  def moveRight = this.copy(gridX=gridX + 1)
+  def tryMoveLeft = this.copy(gridX=gridX - 1)
+  def tryMoveRight = this.copy(gridX=gridX + 1)
 }
 
 case class S(gridX: Int, gridY: Int, currentRotationNr: Int=0) extends Block {
@@ -113,8 +141,8 @@ case class S(gridX: Int, gridY: Int, currentRotationNr: Int=0) extends Block {
   protected def gradientFill = buildGradientFill(Color.cyan, Color.black)
   protected def withNewRotation(newRotationNr: Int) = this.copy(currentRotationNr=newRotationNr)
   def fall: Block = this.copy(gridY=gridY + 1)
-  def moveLeft = this.copy(gridX=gridX - 1)
-  def moveRight = this.copy(gridX=gridX + 1)
+  def tryMoveLeft = this.copy(gridX=gridX - 1)
+  def tryMoveRight = this.copy(gridX=gridX + 1)
 }
 
 case class Z(gridX: Int, gridY: Int, currentRotationNr: Int=0) extends Block {
@@ -122,8 +150,8 @@ case class Z(gridX: Int, gridY: Int, currentRotationNr: Int=0) extends Block {
   protected def gradientFill = buildGradientFill(Color.cyan, Color.black)
   protected def withNewRotation(newRotationNr: Int) = this.copy(currentRotationNr=newRotationNr)
   def fall: Block = this.copy(gridY=gridY + 1)
-  def moveLeft = this.copy(gridX=gridX - 1)
-  def moveRight = this.copy(gridX=gridX + 1)
+  def tryMoveLeft = this.copy(gridX=gridX - 1)
+  def tryMoveRight = this.copy(gridX=gridX + 1)
 }
 
 case class O(gridX: Int, gridY: Int, currentRotationNr: Int=0) extends Block {
@@ -131,8 +159,8 @@ case class O(gridX: Int, gridY: Int, currentRotationNr: Int=0) extends Block {
   protected def gradientFill = buildGradientFill(Color.green, Color.white)
   protected def withNewRotation(newRotationNr: Int) = this.copy(currentRotationNr=newRotationNr)
   def fall: Block = this.copy(gridY=gridY + 1)
-  def moveLeft = this.copy(gridX=gridX - 1)
-  def moveRight = this.copy(gridX=gridX + 1)
+  def tryMoveLeft = this.copy(gridX=gridX - 1)
+  def tryMoveRight = this.copy(gridX=gridX + 1)
 }
 
 

@@ -73,6 +73,7 @@ class Tetris extends BasicGame("Tetris") {
   }
 
 
+
   private def updateBlock(gc: GameContainer) {
     if (blockHasLanded) {
       meldBlockWithGround()
@@ -89,15 +90,21 @@ class Tetris extends BasicGame("Tetris") {
   private def shouldHandleInput = time - lastInputReadTime > InputReadInterval
 
   private def handleInput(input: Input) {
-    lastInputReadTime = time
-    if (input.isKeyDown(Input.KEY_UP)) {
-      block = block.rotateRight
-    }
-    if (input.isKeyDown(Input.KEY_LEFT)) {
-      block = block.moveLeft
-    }
-    if (input.isKeyDown(Input.KEY_RIGHT)) {
-      block = block.moveRight
+    val rotate = () => { block = block.rotateRight }
+    val moveLeft = () => { block = block.moveLeft }
+    val moveRight = () => { block = block.moveRight }
+
+    val keyToAction = Map(
+      Input.KEY_UP -> rotate,
+      Input.KEY_LEFT -> moveLeft,
+      Input.KEY_RIGHT -> moveRight
+    )
+
+    keyToAction foreach { case (key, action) =>
+      if (input.isKeyDown(key)) {
+        action()
+        lastInputReadTime = time
+      }
     }
   }
 
