@@ -15,9 +15,13 @@ import scala.collection.mutable.ArrayBuffer
 object Tetris {
   val Width = 800
   val Height = 600
-  val GridCols = 15
-  val GridRows = 25
+  val GridCols = 10
+  val GridRows = 20
   val BlockSize = 32
+  val GridOffsetX = BlockSize * ((Width/BlockSize)/3)
+  val GridOffsetY = BlockSize
+  val FallSpeed = 200
+  val InputReadInterval = 100
 
   def main(args: Array[String]) {
     val app = new AppGameContainer(new Tetris)
@@ -26,22 +30,21 @@ object Tetris {
   }
 }
 
-sealed trait GameState
-case object Ongoing extends GameState
-case object GameOver extends GameState
-
 class Tetris extends BasicGame("Tetris") {
-  import Tetris.{Width, Height, GridCols, GridRows}
+  import Tetris.{Width, Height, GridCols, GridRows, BlockSize}
+  import Tetris.{GridOffsetX, GridOffsetY}
+  import Tetris.FallSpeed
+  import Tetris.InputReadInterval
 
   private val music = new Music("tetriscala.ogg")
   private val gameOverMusic = new Music("11DieVonstantine.ogg")
-  private val blockSize = Tetris.BlockSize
-  private val fallSpeed = 200
+  private val grid = new Grid
 
-  private var blocks = List[Block]()
   private var time = 0
   private var lastMoveTime = 0
+  private var lastInputReadTime = 0
   private var gameState: GameState = Ongoing
+  private var block: Block = newBlock
 
 
   def init(gc: GameContainer) {
@@ -50,20 +53,10 @@ class Tetris extends BasicGame("Tetris") {
 
   def update(gc: GameContainer, delta: Int) {
     time += delta
-
-    if (endGameConditionReached) {
+    if (endGameConditionReached)
       enterGameState(GameOver)
-    }
-    else {
-      if (blockShouldFall) {
-        lastMoveTime = time
-        blocks = blocksMovedDown
-      }
-      blocks = filterBlocksOnPressedButton(blocks, gc.getInput)
-      if (shouldAddNewBlock) {
-        blocks :+= newBlock
-      }
-    }
+    else
+      updateBlock(gc)
   }
 
   def render(gc: GameContainer, g: Graphics) {
@@ -74,24 +67,62 @@ class Tetris extends BasicGame("Tetris") {
         g.setFont(buildFont)
         g.drawString("Game over!", Width/2-60, Height/2-30)
       case Ongoing =>
-        blocks foreach (_.render(gc, g, offsetX=200))
+        grid.render(gc, g)
+        block.render(gc, g)
     }
   }
 
 
-
-
-  private def blockShouldFall = time - lastMoveTime > fallSpeed
-
-  private def blocksMovedDown = blocks map { _.fall }
-
-  private def newBlock = Block.createRandom(gridX=GridCols/2, gridY=0)
-
-  private def shouldAddNewBlock = math.random > 0.999
-
-  private def endGameConditionReached = {
-    blocks exists (block => block.gridY > Height - blockSize)
+  private def updateBlock(gc: GameContainer) {
+    if (blockHasLanded) {
+      meldBlockWithGround()
+      block = newBlock
+    }
+    else {
+      if (shouldHandleInput)
+        handleInput(gc.getInput)
+      if (blockShouldFall)
+        moveBlockDown()
+    }
   }
+
+  private def shouldHandleInput = time - lastInputReadTime > InputReadInterval
+
+  private def handleInput(input: Input) {
+    lastInputReadTime = time
+    if (input.isKeyDown(Input.KEY_UP)) {
+      block = block.rotateRight
+    }
+    if (input.isKeyDown(Input.KEY_LEFT)) {
+      block = block.moveLeft
+    }
+    if (input.isKeyDown(Input.KEY_RIGHT)) {
+      block = block.moveRight
+    }
+  }
+
+  private def moveBlockDown() {
+    lastMoveTime = time
+    block = block.fall
+  }
+
+  private def blockHasLanded = {
+    block.gridY >= (GridRows-1)
+  }
+
+  private def meldBlockWithGround() {
+    grid.setFilled(block.gridX, block.gridY)
+  }
+
+  //private def coordinatesForBlock(block: Block): (Int, Int) = {
+    //(block.gridX + GridOffsetX, block.gridY + GridOffsetY)
+  //}
+
+  private def blockShouldFall = time - lastMoveTime > FallSpeed
+
+  private def newBlock = Block.createRandom(gridX=(GridCols/2)-1, gridY=0)
+
+  private def endGameConditionReached = time > 100000
 
   private def enterGameState(newGameState: GameState) {
     if (gameState != newGameState) {
