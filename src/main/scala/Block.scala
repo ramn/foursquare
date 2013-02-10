@@ -6,8 +6,9 @@ import org.newdawn.slick.Color
 import org.newdawn.slick.fills.GradientFill
 import org.newdawn.slick.geom.Rectangle
 
+import Tetris.BlockSize
+
 sealed trait Block {
-  import Tetris.BlockSize
 
   type Rotations = IndexedSeq[IndexedSeq[(Int, Int)]]
 
@@ -15,24 +16,40 @@ sealed trait Block {
 
   def gridY: Int
 
-  def render(gc: GameContainer, g: Graphics) {
-    for ((x, y) <- absolutePiecePositions)
+  def render(gc: GameContainer, g: Graphics, offsetX: Int=200, offsetY: Int=0) {
+    for ((x, y) <- absolutePiecePositions(offsetX, offsetY))
       g.fill(new Rectangle(x, y, BlockSize, BlockSize), gradientFill)
   }
 
-  def rotateLeft {
-
+  def rotateLeft: Block = {
+    rotate(-1)
   }
 
-  def rotateRight {
-
+  def rotateRight: Block = {
+    rotate(1)
   }
+
+  def fall: Block
+
+  protected def rotate(direction: Int): Block = {
+    require(direction == 1 || direction == -1)
+    val newRotationNr = {
+      val candidate = (currentRotationNr + direction) % 4
+      if (candidate < 0) 4 else candidate
+    }
+    withNewRotation(newRotationNr)
+  }
+
+  protected def withNewRotation(newRotationNr: Int): Block
 
   protected val currentRotationNr: Int
 
-  protected def absolutePiecePositions = {
-    for ((x, y) <- rotation)
-      yield (x * BlockSize + gridX, y * BlockSize + gridY)
+  protected def absolutePiecePositions(offsetX: Int, offsetY: Int) = {
+    for {
+      (x, y) <- rotation
+      newGridX = x * BlockSize + gridX
+      newGridY = y * BlockSize + gridY
+    } yield (newGridX + offsetX, newGridY + offsetY)
   }
 
   protected val rotation = {
@@ -53,36 +70,50 @@ sealed trait Block {
 case class T(gridX: Int, gridY: Int, currentRotationNr: Int=0) extends Block {
   protected def possibleRotations: Rotations = Blocks.T
   protected def gradientFill = buildGradientFill(Color.red, Color.darkGray)
+  protected def withNewRotation(newRotationNr: Int) = this.copy(currentRotationNr=newRotationNr)
+  def fall: Block = this.copy(gridY=gridY + BlockSize)
 }
 
 case class I(gridX: Int, gridY: Int, currentRotationNr: Int=0) extends Block {
 	protected def possibleRotations: Rotations = Blocks.I
   protected def gradientFill = buildGradientFill(Color.orange, Color.white)
+  protected def withNewRotation(newRotationNr: Int) = this.copy(currentRotationNr=newRotationNr)
+  def fall: Block = this.copy(gridY=gridY + BlockSize)
 }
 
 case class L(gridX: Int, gridY: Int, currentRotationNr: Int=0) extends Block {
 	protected def possibleRotations: Rotations = Blocks.L
   protected def gradientFill = buildGradientFill(Color.yellow, Color.black)
+  protected def withNewRotation(newRotationNr: Int) = this.copy(currentRotationNr=newRotationNr)
+  def fall: Block = this.copy(gridY=gridY + BlockSize)
 }
 
 case class J(gridX: Int, gridY: Int, currentRotationNr: Int=0) extends Block {
 	protected def possibleRotations: Rotations = Blocks.J
   protected def gradientFill = buildGradientFill(Color.yellow, Color.black)
+  protected def withNewRotation(newRotationNr: Int) = this.copy(currentRotationNr=newRotationNr)
+  def fall: Block = this.copy(gridY=gridY + BlockSize)
 }
 
 case class S(gridX: Int, gridY: Int, currentRotationNr: Int=0) extends Block {
 	protected def possibleRotations: Rotations = Blocks.S
   protected def gradientFill = buildGradientFill(Color.cyan, Color.black)
+  protected def withNewRotation(newRotationNr: Int) = this.copy(currentRotationNr=newRotationNr)
+  def fall: Block = this.copy(gridY=gridY + BlockSize)
 }
 
 case class Z(gridX: Int, gridY: Int, currentRotationNr: Int=0) extends Block {
 	protected def possibleRotations: Rotations = Blocks.Z
   protected def gradientFill = buildGradientFill(Color.cyan, Color.black)
+  protected def withNewRotation(newRotationNr: Int) = this.copy(currentRotationNr=newRotationNr)
+  def fall: Block = this.copy(gridY=gridY + BlockSize)
 }
 
 case class O(gridX: Int, gridY: Int, currentRotationNr: Int=0) extends Block {
 	protected def possibleRotations: Rotations = Blocks.O
   protected def gradientFill = buildGradientFill(Color.green, Color.white)
+  protected def withNewRotation(newRotationNr: Int) = this.copy(currentRotationNr=newRotationNr)
+  def fall: Block = this.copy(gridY=gridY + BlockSize)
 }
 
 
@@ -129,13 +160,13 @@ object Blocks {
     IndexedSeq((0, 0), (-1, 0), (1, 0), (2, 0)),
     IndexedSeq((0, 0), (0, -1), (0, 1), (0, 2)))
 
-  val L = IndexedSeq(
+  val J = IndexedSeq(
     IndexedSeq((0, 0), (1, 0), (-1, 0), (-1, -1)),
     IndexedSeq((0, 0), (0, -1), (0, 1), (-1, 1)),
     IndexedSeq((0, 0), (-1, 0), (1, 0), (1, 1)),
     IndexedSeq((0, 0), (0, 1), (0, -1), (1, -1)))
 
-  val J = IndexedSeq(
+  val L = IndexedSeq(
     IndexedSeq((0, 0), (-1, 0), (1, 0), (1, -1)),
     IndexedSeq((0, 0), (0, 1), (0, -1), (-1, -1)),
     IndexedSeq((0, 0), (1, 0), (-1, 0), (-1, 1)),

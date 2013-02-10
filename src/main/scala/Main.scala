@@ -38,7 +38,7 @@ class Tetris extends BasicGame("Tetris") {
   private val blockSize = Tetris.BlockSize
   private val fallSpeed = 200
 
-  private var entities = List[Entity]()
+  private var blocks = List[Block]()
   private var time = 0
   private var lastMoveTime = 0
   private var gameState: GameState = Ongoing
@@ -57,11 +57,11 @@ class Tetris extends BasicGame("Tetris") {
     else {
       if (blockShouldFall) {
         lastMoveTime = time
-        entities = blocksMovedDown
+        blocks = blocksMovedDown
       }
-      entities = filterEntitiesOnPressedButtons(entities, gc.getInput)
+      blocks = filterBlocksOnPressedButton(blocks, gc.getInput)
       if (shouldAddNewBlock) {
-        entities :+= newBlock
+        blocks :+= newBlock
       }
     }
   }
@@ -74,12 +74,7 @@ class Tetris extends BasicGame("Tetris") {
         g.setFont(buildFont)
         g.drawString("Game over!", Width/2-60, Height/2-30)
       case Ongoing =>
-        for (entity <- entities) entity match {
-          case Ball(x, y, color) =>
-            g.setColor(color)
-            g.fill(new Ellipse(x, y, blockSize, blockSize))
-        }
-        Block.createRandom(Width/2, 32).render(gc, g)
+        blocks foreach (_.render(gc, g, offsetX=200))
     }
   }
 
@@ -88,23 +83,14 @@ class Tetris extends BasicGame("Tetris") {
 
   private def blockShouldFall = time - lastMoveTime > fallSpeed
 
-  private def blocksMovedDown = entities map {
-    case ball: Ball => ball.copy(y=ball.y + blockSize)
-    case entity => entity
-  }
+  private def blocksMovedDown = blocks map { _.fall }
 
-  private def newBlock = {
-    val (x, y) = (util.Random.nextInt(Width-blockSize), 0)
-    //entities :+= Ball(x, y)
-    Ball(x, y)
-
-    //Block.createRandom(gridX=GridCols/2, gridY=0)
-  }
+  private def newBlock = Block.createRandom(gridX=GridCols/2, gridY=0)
 
   private def shouldAddNewBlock = math.random > 0.999
 
   private def endGameConditionReached = {
-    entities exists (entity => entity.y > Height - blockSize)
+    blocks exists (block => block.gridY > Height - blockSize)
   }
 
   private def enterGameState(newGameState: GameState) {
@@ -114,24 +100,29 @@ class Tetris extends BasicGame("Tetris") {
     gameState = newGameState
   }
 
-  private def filterEntitiesOnPressedButtons(
-    entities: List[Entity],
+  private def filterBlocksOnPressedButton(
+    blocks: List[Block],
     input: Input
-  ): List[Entity] = {
-    val keyToColor = Map(
-      Input.KEY_B -> Color.blue,
-      Input.KEY_C -> Color.cyan,
-      Input.KEY_G -> Color.green,
-      Input.KEY_M -> Color.magenta,
-      Input.KEY_O -> Color.orange,
-      Input.KEY_P -> Color.pink,
-      Input.KEY_R -> Color.red,
-      Input.KEY_Y -> Color.yellow)
-    val colorsToDelete = keyToColor
-      .filter { case (key, color) => input isKeyDown key }
-      .map { case (key, color) => color }
-      .toSet
-    entities filterNot (e => colorsToDelete(e.color))
+  ): List[Block] = {
+    val keys = List(
+      Input.KEY_T,
+      Input.KEY_I,
+      Input.KEY_L,
+      Input.KEY_J,
+      Input.KEY_S,
+      Input.KEY_Z,
+      Input.KEY_O)
+    val keyIsPressed = keys.map { key => (key, input.isKeyDown(key)) }.toMap
+    def shouldBeRemoved(block: Block) = block match {
+      case b: T => keyIsPressed(Input.KEY_T)
+      case b: I => keyIsPressed(Input.KEY_I)
+      case b: L => keyIsPressed(Input.KEY_L)
+      case b: J => keyIsPressed(Input.KEY_J)
+      case b: S => keyIsPressed(Input.KEY_S)
+      case b: Z => keyIsPressed(Input.KEY_Z)
+      case b: O => keyIsPressed(Input.KEY_O)
+    }
+    blocks filterNot shouldBeRemoved
   }
 
   private def buildFont = {
