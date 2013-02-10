@@ -13,11 +13,11 @@ import org.newdawn.slick.fills.GradientFill
 import scala.collection.mutable.ArrayBuffer
 
 object Tetris {
+  val BlockSize = 32
   val Width = 800
-  val Height = 600
+  val Height = BlockSize * 22
   val GridCols = 10
   val GridRows = 20
-  val BlockSize = 32
   val GridOffsetX = BlockSize * ((Width/BlockSize)/3)
   val GridOffsetY = BlockSize
   val FallSpeed = 200
