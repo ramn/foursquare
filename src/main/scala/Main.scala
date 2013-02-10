@@ -68,7 +68,7 @@ class Tetris extends BasicGame("Tetris") {
     gameState match {
       case GameOver =>
         g.setColor(Color.red)
-        g.setFont(buildFont)
+        g.setFont(FontUtil.buildFont)
         g.drawString("Game over!", Width/2-60, Height/2-30)
       case Ongoing =>
         grid.render(gc, g)
@@ -153,19 +153,5 @@ class Tetris extends BasicGame("Tetris") {
       gameOverMusic.loop()
     }
     gameState = newGameState
-  }
-
-  private def buildFont = {
-    import java.awt.Font
-    import org.newdawn.slick.UnicodeFont
-    import org.newdawn.slick.font.effects.{Effect, ColorEffect}
-    val font = new Font("Arial", Font.BOLD, 20)
-    val uFont = new UnicodeFont(font)
-    uFont.addAsciiGlyphs()
-    val fontEffects = uFont.getEffects.asInstanceOf[java.util.List[Effect]]
-    val fontEffect = new ColorEffect(java.awt.Color.WHITE)
-    fontEffects.add(fontEffect)
-    uFont.loadGlyphs()
-    uFont
   }
 }
