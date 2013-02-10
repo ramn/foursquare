@@ -12,6 +12,7 @@ import Tetris.GridCols
 
 sealed trait Block {
   type Rotations = IndexedSeq[IndexedSeq[(Int, Int)]]
+  type IsBlocked = ((Int, Int)) => Boolean
 
   def gridX: Int
 
@@ -24,13 +25,17 @@ sealed trait Block {
       g.fill(new Rectangle(x, y, BlockSize, BlockSize), gradientFill)
   }
 
-  def rotateLeft: Block = getMovedIfInside(rotate(-1))
+  def rotateLeft(isBlocked: IsBlocked): Block =
+    getMovedIfInside(rotate(-1), isBlocked)
 
-  def rotateRight: Block = getMovedIfInside(rotate(1))
+  def rotateRight(isBlocked: IsBlocked): Block =
+    getMovedIfInside(rotate(1), isBlocked)
 
-  def moveLeft: Block = getMovedIfInside(tryMoveLeft)
+  def moveLeft(isBlocked: IsBlocked): Block =
+    getMovedIfInside(tryMoveLeft, isBlocked)
 
-  def moveRight: Block = getMovedIfInside(tryMoveRight)
+  def moveRight(isBlocked: IsBlocked): Block =
+    getMovedIfInside(tryMoveRight, isBlocked)
 
   def gridPiecePositions =
     for {
@@ -43,11 +48,13 @@ sealed trait Block {
 
   /// Protected methods ///////////////////////////////
 
-  protected def getMovedIfInside(candidate: Block) =
-    if (candidate.isInsideGrid)
+  protected def getMovedIfInside(candidate: Block, isBlocked: IsBlocked) = {
+    val overlapsWithBlocked = candidate.gridPiecePositions exists isBlocked
+    if (candidate.isInsideGrid && !overlapsWithBlocked)
       candidate
     else
       this
+  }
 
   protected def tryMoveLeft: Block
 

@@ -94,9 +94,10 @@ class Tetris extends BasicGame("Tetris") {
   private def shouldHandleInput = time - lastInputReadTime > InputReadInterval
 
   private def handleInput(input: Input) {
-    val rotate = () => { block = block.rotateRight }
-    val moveLeft = () => { block = block.moveLeft }
-    val moveRight = () => { block = block.moveRight }
+    val isBlocked = (grid.isFilled _).tupled
+    val rotate = () => { block = block.rotateRight(isBlocked) }
+    val moveLeft = () => { block = block.moveLeft(isBlocked) }
+    val moveRight = () => { block = block.moveRight(isBlocked) }
     val fall = () => { block = block.fall }
 
     val keyToAction = Map(
