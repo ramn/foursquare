@@ -40,10 +40,6 @@ class Grid {
   def anyIsFilled(coordinates: Seq[(Int, Int)]) =
     coordinates exists { case (x, y) => isFilled(x, y) }
 
-  def hasCompleteRows = grid exists rowIsCompletelyFilled
-
-  def rowIsCompletelyFilled(row: IndexedSeq[Int]) = row forall (_ == 1)
-
   def nukeCompleteRows = {
     def setRowToZero(rowIx: Int) {
       grid(rowIx) = grid(rowIx) map (x => 0)
@@ -58,6 +54,10 @@ class Grid {
     }
   }
 
+
+  private def hasCompleteRows = grid exists rowIsCompletelyFilled
+
+  private def rowIsCompletelyFilled(row: IndexedSeq[Int]) = row forall (_ == 1)
 
   private def withinBounds(col: Int, row: Int) =
     grid.isDefinedAt(row) && grid(row).isDefinedAt(col)

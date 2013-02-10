@@ -140,7 +140,8 @@ class Tetris extends BasicGame("Tetris") {
   private def blockShouldFall = time - lastMoveTime > FallSpeed
 
   private def newBlock = {
-    val candidateBlock = Block.createRandom(gridX=(GridCols/2)-1, gridY=0)
+    val initGridX = (GridCols/2)-1
+    val candidateBlock = Block.createRandom(gridX=initGridX, gridY=0)
     if (grid.anyIsFilled(candidateBlock.gridPiecePositions))
       enterGameState(GameOver)
     candidateBlock
