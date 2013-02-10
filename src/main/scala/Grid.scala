@@ -49,7 +49,8 @@ class Grid {
       val completeRowIx = grid lastIndexWhere rowIsCompletelyFilled
       setRowToZero(completeRowIx)
       val rowsToShiftDown = grid.slice(0, completeRowIx)
-      grid = grid.patch(1, rowsToShiftDown, completeRowIx+1)
+      val rowsToPatchLength = rowsToShiftDown.length
+      grid = grid.patch(1, rowsToShiftDown, rowsToPatchLength)
       setRowToZero(0)
     }
   }
