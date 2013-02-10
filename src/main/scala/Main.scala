@@ -10,7 +10,6 @@ import org.newdawn.slick.Input
 import org.newdawn.slick.Music
 import org.newdawn.slick.fills.GradientFill
 
-import scala.collection.mutable.ArrayBuffer
 
 object Tetris {
   val BlockSize = 32
