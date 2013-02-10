@@ -121,10 +121,6 @@ class Tetris extends BasicGame("Tetris") {
     grid.setFilled(block.gridX, block.gridY)
   }
 
-  //private def coordinatesForBlock(block: Block): (Int, Int) = {
-    //(block.gridX + GridOffsetX, block.gridY + GridOffsetY)
-  //}
-
   private def blockShouldFall = time - lastMoveTime > FallSpeed
 
   private def newBlock = Block.createRandom(gridX=(GridCols/2)-1, gridY=0)
