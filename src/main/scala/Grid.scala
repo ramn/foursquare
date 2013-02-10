@@ -18,7 +18,6 @@ class Grid {
   def render(g: Graphics) {
     renderBorder(g)
     renderFilledCells(g)
-    //renderRowNums(g)
   }
 
   def setFilled(col: Int, row: Int) {
@@ -83,16 +82,6 @@ class Grid {
     } {
       g.setColor(Color.white)
       g.fill(new Rectangle(x, y, BlockSize, BlockSize), gradient)
-    }
-  }
-
-  private def renderRowNums(g: Graphics) {
-    for {
-      (_, rowIx) <- grid.zipWithIndex
-      (x, y) = absoluteCoordinate(0, rowIx)
-    } {
-      g.setColor(Color.blue)
-      g.drawString(rowIx.toString, x, y)
     }
   }
 
