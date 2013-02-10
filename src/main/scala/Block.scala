@@ -74,8 +74,8 @@ sealed trait Block {
     } yield (newGridX + GridOffsetX, newGridY + GridOffsetY)
 
   protected def isInsideGrid = {
-    val (leftX, leftY) = leftmostPieceCoord
-    val (rightX, rightY) = rightmostPieceCoord
+    val (leftX, _) = leftmostPieceCoord
+    val (rightX, _) = rightmostPieceCoord
     leftX >= 0 && rightX <= GridCols-1
   }
 
