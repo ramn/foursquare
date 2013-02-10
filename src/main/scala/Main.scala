@@ -93,11 +93,13 @@ class Tetris extends BasicGame("Tetris") {
     val rotate = () => { block = block.rotateRight }
     val moveLeft = () => { block = block.moveLeft }
     val moveRight = () => { block = block.moveRight }
+    val fall = () => { block = block.fall }
 
     val keyToAction = Map(
       Input.KEY_UP -> rotate,
       Input.KEY_LEFT -> moveLeft,
-      Input.KEY_RIGHT -> moveRight
+      Input.KEY_RIGHT -> moveRight,
+      Input.KEY_DOWN -> fall
     )
 
     keyToAction foreach { case (key, action) =>
