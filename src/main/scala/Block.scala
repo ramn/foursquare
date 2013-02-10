@@ -24,9 +24,9 @@ sealed trait Block {
       g.fill(new Rectangle(x, y, BlockSize, BlockSize), gradientFill)
   }
 
-  def rotateLeft: Block = rotate(-1)
+  def rotateLeft: Block = getMovedIfInside(rotate(-1))
 
-  def rotateRight: Block = rotate(1)
+  def rotateRight: Block = getMovedIfInside(rotate(1))
 
   def moveLeft: Block = getMovedIfInside(tryMoveLeft)
 
