@@ -18,7 +18,7 @@ class Grid {
   def render(gc: GameContainer, g: Graphics) {
     renderBorder(g)
     renderFilledCells(g)
-    renderRowNums(g)
+    //renderRowNums(g)
   }
 
   def setFilled(col: Int, row: Int) {
