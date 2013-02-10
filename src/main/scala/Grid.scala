@@ -13,7 +13,7 @@ import Tetris.{GridCols, GridRows}
 import Tetris.{GridOffsetX, GridOffsetY}
 
 class Grid {
-  private val grid = mutable.IndexedSeq.fill(GridRows, GridCols)(0)
+  private var grid = mutable.IndexedSeq.fill(GridRows, GridCols)(0)
 
   def render(gc: GameContainer, g: Graphics) {
     renderBorder(g)
@@ -40,6 +40,23 @@ class Grid {
   def anyIsFilled(coordinates: Seq[(Int, Int)]) =
     coordinates exists { case (x, y) => isFilled(x, y) }
 
+  def hasCompleteRows = grid exists rowIsCompletelyFilled
+
+  def rowIsCompletelyFilled(row: IndexedSeq[Int]) = row forall (_ == 1)
+
+  def nukeCompleteRows = {
+    def setRowToZero(rowIx: Int) {
+      grid(rowIx) = grid(rowIx) map (x => 0)
+    }
+
+    while (hasCompleteRows) {
+      val completeRowIx = grid lastIndexWhere rowIsCompletelyFilled
+      setRowToZero(completeRowIx)
+      val rowsToShiftDown = grid.slice(0, completeRowIx)
+      grid = grid.patch(1, rowsToShiftDown, completeRowIx+1)
+      setRowToZero(0)
+    }
+  }
 
 
   private def withinBounds(col: Int, row: Int) =

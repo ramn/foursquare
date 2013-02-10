@@ -89,6 +89,7 @@ class Tetris extends BasicGame("Tetris") {
       if (blockShouldFall)
         moveBlockDown()
     }
+    grid.nukeCompleteRows
   }
 
   private def shouldHandleInput = time - lastInputReadTime > InputReadInterval
