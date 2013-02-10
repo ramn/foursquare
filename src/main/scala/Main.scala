@@ -53,10 +53,14 @@ class Tetris extends BasicGame("Tetris") {
 
   def update(gc: GameContainer, delta: Int) {
     time += delta
-    if (endGameConditionReached)
-      enterGameState(GameOver)
-    else
-      updateBlock(gc)
+    gameState match {
+      case Ongoing =>
+        if (endGameConditionReached)
+          enterGameState(GameOver)
+        else
+          updateBlock(gc)
+      case GameOver =>
+    }
   }
 
   def render(gc: GameContainer, g: Graphics) {
@@ -116,7 +120,12 @@ class Tetris extends BasicGame("Tetris") {
   }
 
   private def blockHasLanded = {
-    block.gridY >= (GridRows-1)
+    type Pred = (Int, Int) => Boolean
+    val touchingBottomPredicate: Pred = (x, y) => y == GridRows-1
+    val touchingFilledCell: Pred = (x, y) => grid.isFilled(x, y) || grid.isFilled(x, y+1)
+    block.gridPiecePositions exists { case (x, y) =>
+      List(touchingBottomPredicate, touchingFilledCell) exists (_.apply(x, y))
+    }
   }
 
   private def meldBlockWithGround() {
@@ -128,9 +137,16 @@ class Tetris extends BasicGame("Tetris") {
 
   private def blockShouldFall = time - lastMoveTime > FallSpeed
 
-  private def newBlock = Block.createRandom(gridX=(GridCols/2)-1, gridY=0)
+  private def newBlock = {
+    val candidateBlock = Block.createRandom(gridX=(GridCols/2)-1, gridY=0)
+    if (grid.anyIsFilled(candidateBlock.gridPiecePositions))
+      enterGameState(GameOver)
+    candidateBlock
+  }
 
-  private def endGameConditionReached = time > 100000
+  private def endGameConditionReached = {
+    time > 100000
+  }
 
   private def enterGameState(newGameState: GameState) {
     if (gameState != newGameState) {

@@ -22,21 +22,28 @@ class Grid {
   }
 
   def setFilled(col: Int, row: Int) {
-    var outOfBounds = false
-    if (grid.isDefinedAt(row)) {
-      if (grid(row).isDefinedAt(col)) {
-        grid(row)(col) = 1
-      } else {
-        outOfBounds = true
-      }
-    } else {
-      outOfBounds = true
-    }
-    if (outOfBounds) {
-      val msg = "Trying to access coords outside of grid, col: %s, row: %s".format(col, row)
+    if (withinBounds(col=col, row=row))
+      grid(row)(col) = 1
+    else {
+      val msg = "Trying to fill coords outside of grid, col: %s, row: %s"
+        .format(col, row)
       System.err.println(msg)
     }
   }
+
+  def isFilled(col: Int, row: Int) =
+    if (withinBounds(col=col, row=row))
+      grid(row)(col) == 1
+    else
+      false
+
+  def anyIsFilled(coordinates: Seq[(Int, Int)]) =
+    coordinates exists { case (x, y) => isFilled(x, y) }
+
+
+
+  private def withinBounds(col: Int, row: Int) =
+    grid.isDefinedAt(row) && grid(row).isDefinedAt(col)
 
   private def renderBorder(g: Graphics) {
     val width = GridCols * BlockSize
