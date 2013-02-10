@@ -1,6 +1,5 @@
 package se.ramn.tetris
 
-import org.newdawn.slick.geom.{Rectangle, Ellipse}
 import org.newdawn.slick.AppGameContainer
 import org.newdawn.slick.BasicGame
 import org.newdawn.slick.Color
@@ -8,7 +7,6 @@ import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
 import org.newdawn.slick.Input
 import org.newdawn.slick.Music
-import org.newdawn.slick.fills.GradientFill
 
 
 object Tetris {
