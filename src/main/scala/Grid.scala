@@ -18,10 +18,24 @@ class Grid {
   def render(gc: GameContainer, g: Graphics) {
     renderBorder(g)
     renderFilledCells(g)
+    renderRowNums(g)
   }
 
   def setFilled(col: Int, row: Int) {
-    grid(row)(col) = 1
+    var outOfBounds = false
+    if (grid.isDefinedAt(row)) {
+      if (grid(row).isDefinedAt(col)) {
+        grid(row)(col) = 1
+      } else {
+        outOfBounds = true
+      }
+    } else {
+      outOfBounds = true
+    }
+    if (outOfBounds) {
+      val msg = "Trying to access coords outside of grid, col: %s, row: %s".format(col, row)
+      System.err.println(msg)
+    }
   }
 
   private def renderBorder(g: Graphics) {
@@ -40,7 +54,17 @@ class Grid {
       (x, y) = absoluteCoordinate(colIx, rowIx)
     } {
       g.setColor(Color.white)
-      g.fill(new Rectangle(x, y-(BlockSize*2), BlockSize, BlockSize))
+      g.fill(new Rectangle(x, y, BlockSize, BlockSize))
+    }
+  }
+
+  private def renderRowNums(g: Graphics) {
+    for {
+      (_, rowIx) <- grid.zipWithIndex
+      (x, y) = absoluteCoordinate(0, rowIx)
+    } {
+      g.setColor(Color.blue)
+      g.drawString(rowIx.toString, x, y)
     }
   }
 

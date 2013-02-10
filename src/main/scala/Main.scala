@@ -118,6 +118,9 @@ class Tetris extends BasicGame("Tetris") {
   }
 
   private def meldBlockWithGround() {
+    block.gridPiecePositions foreach { case (x, y) =>
+      grid.setFilled(x, y)
+    }
     grid.setFilled(block.gridX, block.gridY)
   }
 

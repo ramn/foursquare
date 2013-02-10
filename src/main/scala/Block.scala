@@ -11,37 +11,43 @@ import Tetris.{GridOffsetX, GridOffsetY}
 import Tetris.GridCols
 
 sealed trait Block {
-
   type Rotations = IndexedSeq[IndexedSeq[(Int, Int)]]
 
   def gridX: Int
 
   def gridY: Int
 
+  def fall: Block
+
   def render(gc: GameContainer, g: Graphics) {
     for ((x, y) <- absolutePiecePositions)
       g.fill(new Rectangle(x, y, BlockSize, BlockSize), gradientFill)
   }
 
-  def rotateLeft: Block = {
-    rotate(-1)
-  }
+  def rotateLeft: Block = rotate(-1)
 
-  def rotateRight: Block = {
-    rotate(1)
-  }
+  def rotateRight: Block = rotate(1)
 
   def moveLeft: Block = getMovedIfInside(tryMoveLeft)
 
   def moveRight: Block = getMovedIfInside(tryMoveRight)
+
+  def gridPiecePositions =
+    for {
+      (x, y) <- rotation
+      newGridX = (x + gridX)
+      newGridY = (y + gridY)
+    } yield (newGridX, newGridY)
+
+
+
+  /// Protected methods ///////////////////////////////
 
   protected def getMovedIfInside(candidate: Block) =
     if (candidate.isInsideGrid)
       candidate
     else
       this
-
-  def fall: Block
 
   protected def tryMoveLeft: Block
 
@@ -62,9 +68,9 @@ sealed trait Block {
 
   protected def absolutePiecePositions =
     for {
-      (x, y) <- rotation
-      newGridX = (x + gridX) * BlockSize
-      newGridY = (y + gridY) * BlockSize
+      (x, y) <- gridPiecePositions
+      newGridX = x * BlockSize
+      newGridY = y * BlockSize
     } yield (newGridX + GridOffsetX, newGridY + GridOffsetY)
 
   protected def isInsideGrid = {
