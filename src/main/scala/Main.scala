@@ -15,6 +15,9 @@ import scala.collection.mutable.ArrayBuffer
 object Tetris {
   val Width = 800
   val Height = 600
+  val GridCols = 15
+  val GridRows = 25
+  val BlockSize = 32
 
   def main(args: Array[String]) {
     val app = new AppGameContainer(new Tetris)
@@ -28,10 +31,11 @@ case object Ongoing extends GameState
 case object GameOver extends GameState
 
 class Tetris extends BasicGame("Tetris") {
-  import Tetris.{Width, Height}
+  import Tetris.{Width, Height, GridCols, GridRows}
 
   private val music = new Music("tetriscala.ogg")
-  private val blockSize = 32
+  private val gameOverMusic = new Music("11DieVonstantine.ogg")
+  private val blockSize = Tetris.BlockSize
   private val fallSpeed = 200
 
   private var entities = List[Entity]()
@@ -46,26 +50,20 @@ class Tetris extends BasicGame("Tetris") {
 
   def update(gc: GameContainer, delta: Int) {
     time += delta
-    val addNewEntity = math.random > 0.999
 
-    if (entities exists (entity => entity.y > Height - blockSize))
-      gameState = GameOver
-
-    if (time - lastMoveTime > fallSpeed) {
-      lastMoveTime = time
-      val movedEntities = entities map {
-        case ball: Ball => ball.copy(y=ball.y + blockSize)
-        case entity => entity
+    if (endGameConditionReached) {
+      enterGameState(GameOver)
+    }
+    else {
+      if (blockShouldFall) {
+        lastMoveTime = time
+        entities = blocksMovedDown
       }
-      entities = movedEntities
+      entities = filterEntitiesOnPressedButtons(entities, gc.getInput)
+      if (shouldAddNewBlock) {
+        entities :+= newBlock
+      }
     }
-
-    if (addNewEntity) {
-      val (x, y) = (util.Random.nextInt(Width-blockSize), 0)
-      entities :+= Ball(x, y)
-    }
-
-    entities = filterEntitiesOnPressedButtons(entities, gc.getInput)
   }
 
   def render(gc: GameContainer, g: Graphics) {
@@ -81,10 +79,45 @@ class Tetris extends BasicGame("Tetris") {
             g.setColor(color)
             g.fill(new Ellipse(x, y, blockSize, blockSize))
         }
+        Block.createRandom(Width/2, 32).render(gc, g)
     }
   }
 
-  private def filterEntitiesOnPressedButtons(entities: List[Entity], input: Input): List[Entity] = {
+
+
+
+  private def blockShouldFall = time - lastMoveTime > fallSpeed
+
+  private def blocksMovedDown = entities map {
+    case ball: Ball => ball.copy(y=ball.y + blockSize)
+    case entity => entity
+  }
+
+  private def newBlock = {
+    val (x, y) = (util.Random.nextInt(Width-blockSize), 0)
+    //entities :+= Ball(x, y)
+    Ball(x, y)
+
+    //Block.createRandom(gridX=GridCols/2, gridY=0)
+  }
+
+  private def shouldAddNewBlock = math.random > 0.999
+
+  private def endGameConditionReached = {
+    entities exists (entity => entity.y > Height - blockSize)
+  }
+
+  private def enterGameState(newGameState: GameState) {
+    if (gameState != newGameState) {
+      gameOverMusic.loop()
+    }
+    gameState = newGameState
+  }
+
+  private def filterEntitiesOnPressedButtons(
+    entities: List[Entity],
+    input: Input
+  ): List[Entity] = {
     val keyToColor = Map(
       Input.KEY_B -> Color.blue,
       Input.KEY_C -> Color.cyan,
