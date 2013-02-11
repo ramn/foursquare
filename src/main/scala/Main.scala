@@ -51,11 +51,7 @@ class Tetris extends BasicGame("Tetris") {
   def update(gc: GameContainer, delta: Int) {
     time += delta
     gameState match {
-      case Ongoing =>
-        if (endGameConditionReached)
-          enterGameState(GameOver)
-        else
-          updateBlock(gc)
+      case Ongoing => updateBlock(gc)
       case GameOver =>
     }
   }
@@ -142,10 +138,6 @@ class Tetris extends BasicGame("Tetris") {
     if (grid.anyIsFilled(candidateBlock.gridPiecePositions))
       enterGameState(GameOver)
     candidateBlock
-  }
-
-  private def endGameConditionReached = {
-    time > 100000
   }
 
   private def enterGameState(newGameState: GameState) {
