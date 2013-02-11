@@ -6,9 +6,9 @@ import org.newdawn.slick.Color
 import org.newdawn.slick.fills.GradientFill
 import org.newdawn.slick.geom.Rectangle
 
-import Tetris.BlockSize
-import Tetris.{GridOffsetX, GridOffsetY}
-import Tetris.GridCols
+import FourSquare.BlockSize
+import FourSquare.{GridOffsetX, GridOffsetY}
+import FourSquare.GridCols
 
 sealed trait Block {
   type Rotations = IndexedSeq[IndexedSeq[(Int, Int)]]

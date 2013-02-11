@@ -9,7 +9,7 @@ import org.newdawn.slick.Input
 import org.newdawn.slick.Music
 
 
-object Tetris {
+object FourSquare {
   val BlockSize = 32
   val Width = 800
   val Height = BlockSize * 22
@@ -21,17 +21,17 @@ object Tetris {
   val InputReadInterval = 150
 
   def main(args: Array[String]) {
-    val app = new AppGameContainer(new Tetris)
+    val app = new AppGameContainer(new FourSquare)
     app.setDisplayMode(Width, Height, false)
     app.start()
   }
 }
 
-class Tetris extends BasicGame("Tetris") {
-  import Tetris.{Width, Height, GridCols, GridRows, BlockSize}
-  import Tetris.{GridOffsetX, GridOffsetY}
-  import Tetris.FallSpeed
-  import Tetris.InputReadInterval
+class FourSquare extends BasicGame("FourSquare") {
+  import FourSquare.{Width, Height, GridCols, GridRows, BlockSize}
+  import FourSquare.{GridOffsetX, GridOffsetY}
+  import FourSquare.FallSpeed
+  import FourSquare.InputReadInterval
 
   private val music = new Music("tetriscala.ogg")
   private val gameOverMusic = new Music("11DieVonstantine.ogg")

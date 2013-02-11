@@ -8,9 +8,9 @@ import org.newdawn.slick.Color
 import org.newdawn.slick.fills.GradientFill
 import org.newdawn.slick.geom.Rectangle
 
-import Tetris.BlockSize
-import Tetris.{GridCols, GridRows}
-import Tetris.{GridOffsetX, GridOffsetY}
+import FourSquare.BlockSize
+import FourSquare.{GridCols, GridRows}
+import FourSquare.{GridOffsetX, GridOffsetY}
 
 class Grid {
   private var grid = mutable.IndexedSeq.fill(GridRows, GridCols)(0)
@@ -86,7 +86,7 @@ class Grid {
   }
 
   private def absoluteCoordinate(x: Int, y: Int) = {
-    import Tetris.{GridOffsetX, GridOffsetY}
+    import FourSquare.{GridOffsetX, GridOffsetY}
     (x * BlockSize + GridOffsetX, y * BlockSize + GridOffsetY)
   }
 }
