@@ -1,4 +1,4 @@
-package se.ramn.tetris
+package se.ramn.foursquare
 
 import org.newdawn.slick.AppGameContainer
 import org.newdawn.slick.BasicGame

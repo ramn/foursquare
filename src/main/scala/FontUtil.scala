@@ -1,4 +1,4 @@
-package se.ramn.tetris
+package se.ramn.foursquare
 
 object FontUtil {
   def buildFont = {
