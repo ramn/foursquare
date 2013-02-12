@@ -4,7 +4,7 @@ seq(slickSettings: _*)
 
 seq(oldLwjglSettings: _*)
 
-name := "Tetris"
+name := "FourSquare"
 
 organization := "se.ramn"
 
